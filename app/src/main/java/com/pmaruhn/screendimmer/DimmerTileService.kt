@@ -32,19 +32,25 @@ class DimmerTileService : TileService() {
             return
         }
 
-        val isEnabled = prefsManager.isDimmerEnabled
-        if (isEnabled) {
+        val isCurrentlyEnabled = prefsManager.isDimmerEnabled
+        if (isCurrentlyEnabled) {
+            // Turn OFF the dimmer
             DimmerService.stop(this)
+            updateTileToState(false)
         } else {
+            // Turn ON the dimmer
             DimmerService.start(this)
+            updateTileToState(true)
         }
-
-        updateTileState()
     }
 
     private fun updateTileState() {
-        val tile = qsTile ?: return
         val isEnabled = prefsManager.isDimmerEnabled
+        updateTileToState(isEnabled)
+    }
+
+    private fun updateTileToState(isEnabled: Boolean) {
+        val tile = qsTile ?: return
         val hasPermission = Settings.canDrawOverlays(this)
 
         tile.state = when {
