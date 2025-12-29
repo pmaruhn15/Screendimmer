@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Screen Dimmer</string>
+    <string name="app_name">Dimmer</string>
     <string name="app_description">Verdunkle deinen Bildschirm unter die minimale Helligkeit des Systems</string>
 
     <!-- Permissions -->
     <string name="permission_required">Berechtigung erforderlich</string>
-    <string name="permission_description">Screen Dimmer benötigt die Berechtigung \"Über anderen Apps anzeigen\", um den Bildschirm zu verdunkeln.</string>
+    <string name="permission_description">Dimmer benötigt die Berechtigung \"Über anderen Apps anzeigen\", um den Bildschirm zu verdunkeln.</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="permission_granted">Berechtigung erteilt!</string>
     <string name="permission_denied">Berechtigung verweigert</string>
 
     <!-- Permission Dialog -->
     <string name="permission_dialog_title">Overlay-Berechtigung</string>
-    <string name="permission_dialog_message">Um den Bildschirm zu verdunkeln, muss \"Screen Dimmer\" über anderen Apps angezeigt werden dürfen.\n\nAuf der nächsten Seite:\n1. Finde \"Screen Dimmer\" in der Liste\n2. Aktiviere den Schalter</string>
+    <string name="permission_dialog_message">Um den Bildschirm zu verdunkeln, muss \"Dimmer\" über anderen Apps angezeigt werden dürfen.\n\nAuf der nächsten Seite:\n1. Finde \"Dimmer\" in der Liste\n2. Aktiviere den Schalter</string>
     <string name="permission_dialog_button">Zu Einstellungen</string>
 
     <!-- Battery Optimization -->
@@ -24,7 +24,7 @@
 
     <!-- Alarm Permission -->
     <string name="alarm_permission_title">Alarm-Berechtigung</string>
-    <string name="alarm_permission_message">Um Zeitpläne zu verwenden, benötigt Screen Dimmer die Berechtigung für exakte Alarme.\n\nAuf der nächsten Seite:\n1. Finde \"Screen Dimmer\"\n2. Erlaube exakte Alarme</string>
+    <string name="alarm_permission_message">Um Zeitpläne zu verwenden, benötigt Dimmer die Berechtigung für exakte Alarme.\n\nAuf der nächsten Seite:\n1. Finde \"Dimmer\"\n2. Erlaube exakte Alarme</string>
     <string name="alarm_permission_granted">Alarm-Berechtigung erteilt!</string>
     <string name="alarm_settings_not_found">Alarm-Einstellungen nicht gefunden</string>
 
@@ -56,7 +56,7 @@
     <!-- Notification -->
     <string name="notification_channel_name">Dimmer Service</string>
     <string name="notification_channel_description">Zeigt an, wenn der Bildschirm-Dimmer aktiv ist</string>
-    <string name="notification_title">Screen Dimmer aktiv</string>
+    <string name="notification_title">Dimmer aktiv</string>
     <string name="notification_text">Verdunkelung: %d%%</string>
     <string name="notification_action_stop">Ausschalten</string>
 </resources>
