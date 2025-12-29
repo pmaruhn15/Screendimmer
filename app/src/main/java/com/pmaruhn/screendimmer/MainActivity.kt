@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,25 +22,40 @@ class MainActivity : AppCompatActivity() {
     private lateinit var scheduleManager: ScheduleManager
 
     companion object {
+        private const val TAG = "ScreenDimmer"
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 1001
         private const val BATTERY_OPTIMIZATION_REQUEST_CODE = 1002
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        try {
+            Log.d(TAG, "onCreate started")
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+            Log.d(TAG, "Layout inflated")
 
-        prefsManager = PreferencesManager(this)
-        scheduleManager = ScheduleManager(this)
+            prefsManager = PreferencesManager(this)
+            scheduleManager = ScheduleManager(this)
+            Log.d(TAG, "Managers created")
 
-        setupUI()
-        checkOverlayPermission()
+            setupUI()
+            Log.d(TAG, "UI setup complete")
+            checkOverlayPermission()
+            Log.d(TAG, "onCreate complete")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onCreate", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        updateUI()
+        try {
+            updateUI()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onResume", e)
+        }
     }
 
     private fun setupUI() {
@@ -215,8 +231,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isBatteryOptimizationEnabled(): Boolean {
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        return !powerManager.isIgnoringBatteryOptimizations(packageName)
+        return try {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
+            powerManager?.let {
+                !it.isIgnoringBatteryOptimizations(packageName)
+            } ?: false
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking battery optimization", e)
+            false // Assume not optimized if we can't check
+        }
     }
 
     private fun requestDisableBatteryOptimization() {
