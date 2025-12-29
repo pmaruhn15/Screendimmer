@@ -197,7 +197,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?android:divider"
+                    android:background="#E0E0E0"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Start on Boot -->
@@ -334,7 +334,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?android:divider"
+                    android:background="#E0E0E0"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Auto-On -->
