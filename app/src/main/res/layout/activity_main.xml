@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:text="@string/app_name"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="?android:textColorPrimary"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="@string/app_description"
             android:textSize="14sp"
-            android:textColor="?android:textColorSecondary"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="24dp" />
 
         <!-- Permission Card -->
@@ -35,9 +35,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="#FFEBEE"
+            app:cardBackgroundColor="@color/card_error"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="4dp"
+            app:strokeColor="@color/error_text"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -51,7 +53,7 @@
                     android:text="@string/permission_required"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#C62828"
+                    android:textColor="@color/error_text"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
@@ -59,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/permission_description"
                     android:textSize="14sp"
-                    android:textColor="#B71C1C"
+                    android:textColor="#FFCDD2"
                     android:layout_marginBottom="12dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -67,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/grant_permission"
-                    app:backgroundTint="#C62828" />
+                    app:backgroundTint="@color/error_text" />
 
             </LinearLayout>
 
@@ -80,9 +82,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:visibility="gone"
-            app:cardBackgroundColor="#FFF3E0"
+            app:cardBackgroundColor="@color/card_warning"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="4dp"
+            app:strokeColor="@color/warning"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,7 +100,7 @@
                     android:text="@string/battery_optimization_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#E65100"
+                    android:textColor="@color/warning"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
@@ -104,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/battery_optimization_description"
                     android:textSize="14sp"
-                    android:textColor="#BF360C"
+                    android:textColor="#FFCC80"
                     android:layout_marginBottom="12dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -112,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/disable_battery_optimization"
-                    app:backgroundTint="#E65100" />
+                    app:backgroundTint="@color/warning_dark" />
 
             </LinearLayout>
 
@@ -123,8 +127,9 @@
             android:id="@+id/cardSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/surface"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -151,14 +156,14 @@
                             android:layout_height="wrap_content"
                             android:text="@string/enable_dimmer"
                             android:textSize="16sp"
-                            android:textColor="?android:textColorPrimary" />
+                            android:textColor="@color/text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/enable_dimmer_description"
                             android:textSize="12sp"
-                            android:textColor="?android:textColorSecondary" />
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -175,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dim_level"
                     android:textSize="16sp"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@color/text_primary"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -185,19 +190,21 @@
                     android:text="50%"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:textColor="?colorPrimary"
+                    android:textColor="@color/primary"
                     android:layout_marginBottom="8dp" />
 
                 <SeekBar
                     android:id="@+id/seekBarDimLevel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:progressTint="@color/primary"
+                    android:thumbTint="@color/primary"
                     android:layout_marginBottom="24dp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E0E0E0"
+                    android:background="@color/divider"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Start on Boot -->
@@ -218,14 +225,14 @@
                             android:layout_height="wrap_content"
                             android:text="@string/start_on_boot"
                             android:textSize="16sp"
-                            android:textColor="?android:textColorPrimary" />
+                            android:textColor="@color/text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/start_on_boot_description"
                             android:textSize="12sp"
-                            android:textColor="?android:textColorSecondary" />
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -246,8 +253,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surface"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -261,7 +269,7 @@
                     android:text="@string/schedule_title"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@color/text_primary"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Auto-Off -->
@@ -283,14 +291,14 @@
                             android:layout_height="wrap_content"
                             android:text="@string/auto_off_title"
                             android:textSize="16sp"
-                            android:textColor="?android:textColorPrimary" />
+                            android:textColor="@color/text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/auto_off_description"
                             android:textSize="12sp"
-                            android:textColor="?android:textColorSecondary" />
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -318,7 +326,7 @@
                         android:layout_weight="1"
                         android:text="@string/auto_off_time"
                         android:textSize="14sp"
-                        android:textColor="?android:textColorSecondary" />
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/textAutoOffTime"
@@ -327,14 +335,14 @@
                         android:text="07:00"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="?colorPrimary" />
+                        android:textColor="@color/primary" />
 
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E0E0E0"
+                    android:background="@color/divider"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Auto-On -->
@@ -356,14 +364,14 @@
                             android:layout_height="wrap_content"
                             android:text="@string/auto_on_title"
                             android:textSize="16sp"
-                            android:textColor="?android:textColorPrimary" />
+                            android:textColor="@color/text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/auto_on_description"
                             android:textSize="12sp"
-                            android:textColor="?android:textColorSecondary" />
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -390,7 +398,7 @@
                         android:layout_weight="1"
                         android:text="@string/auto_on_time"
                         android:textSize="14sp"
-                        android:textColor="?android:textColorSecondary" />
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/textAutoOnTime"
@@ -399,7 +407,7 @@
                         android:text="22:00"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="?colorPrimary" />
+                        android:textColor="@color/primary" />
 
                 </LinearLayout>
 
@@ -412,8 +420,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/surface"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -427,7 +437,7 @@
                     android:text="@string/quick_settings_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@color/text_primary"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
@@ -435,7 +445,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/quick_settings_instructions"
                     android:textSize="14sp"
-                    android:textColor="?android:textColorSecondary" />
+                    android:textColor="@color/text_secondary" />
 
             </LinearLayout>
 
