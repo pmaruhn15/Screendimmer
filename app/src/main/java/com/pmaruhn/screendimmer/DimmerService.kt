@@ -10,11 +10,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Point
 import android.os.Build
 import android.os.IBinder
 import android.view.View
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -29,6 +31,10 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
         const val ACTION_START = "com.pmaruhn.screendimmer.ACTION_START"
         const val ACTION_STOP = "com.pmaruhn.screendimmer.ACTION_STOP"
         const val ACTION_UPDATE = "com.pmaruhn.screendimmer.ACTION_UPDATE"
+
+        // Broadcast action for state changes
+        const val ACTION_STATE_CHANGED = "com.pmaruhn.screendimmer.ACTION_STATE_CHANGED"
+        const val EXTRA_IS_ENABLED = "is_enabled"
 
         fun start(context: Context) {
             val intent = Intent(context, DimmerService::class.java).apply {
@@ -70,10 +76,12 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
                 startForeground(NOTIFICATION_ID, createNotification())
                 showOverlay()
                 prefsManager.isDimmerEnabled = true
+                broadcastStateChange(true)
             }
             ACTION_STOP -> {
                 hideOverlay()
                 prefsManager.isDimmerEnabled = false
+                broadcastStateChange(false)
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -89,6 +97,9 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
     override fun onDestroy() {
         prefsManager.unregisterOnChangeListener(this)
         hideOverlay()
+        // Ensure state is synced on destroy
+        prefsManager.isDimmerEnabled = false
+        broadcastStateChange(false)
         super.onDestroy()
     }
 
@@ -96,6 +107,21 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
         if (key == "dimmer_level") {
             updateOverlay()
         }
+    }
+
+    private fun broadcastStateChange(isEnabled: Boolean) {
+        // Send local broadcast for in-app components
+        val localIntent = Intent(ACTION_STATE_CHANGED).apply {
+            putExtra(EXTRA_IS_ENABLED, isEnabled)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent)
+
+        // Send global broadcast for system components (like TileService)
+        val globalIntent = Intent(ACTION_STATE_CHANGED).apply {
+            putExtra(EXTRA_IS_ENABLED, isEnabled)
+            setPackage(packageName)
+        }
+        sendBroadcast(globalIntent)
     }
 
     private fun showOverlay() {
@@ -146,9 +172,23 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
             WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY
         }
 
+        // Get the real screen size including navigation bar
+        val screenSize = Point()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val bounds = windowManager?.currentWindowMetrics?.bounds
+            screenSize.x = bounds?.width() ?: 0
+            screenSize.y = bounds?.height() ?: 0
+        } else {
+            @Suppress("DEPRECATION")
+            windowManager?.defaultDisplay?.getRealSize(screenSize)
+        }
+
+        // Add extra padding to ensure full coverage
+        val extraPadding = 200
+
         return WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
+            screenSize.x + extraPadding,
+            screenSize.y + extraPadding,
             type,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
@@ -158,6 +198,8 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
                     WindowManager.LayoutParams.FLAG_FULLSCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {
+            x = -extraPadding / 2
+            y = -extraPadding / 2
             gravity = android.view.Gravity.TOP or android.view.Gravity.START
             // Cover display cutouts (notch) on Android P+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

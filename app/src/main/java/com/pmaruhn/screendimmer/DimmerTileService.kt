@@ -1,6 +1,9 @@
 package com.pmaruhn.screendimmer
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.provider.Settings
@@ -11,9 +14,35 @@ class DimmerTileService : TileService() {
 
     private lateinit var prefsManager: PreferencesManager
 
+    private val stateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == DimmerService.ACTION_STATE_CHANGED) {
+                val isEnabled = intent.getBooleanExtra(DimmerService.EXTRA_IS_ENABLED, false)
+                updateTileToState(isEnabled)
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         prefsManager = PreferencesManager(this)
+
+        // Register receiver for state changes
+        val filter = IntentFilter(DimmerService.ACTION_STATE_CHANGED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(stateReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(stateReceiver, filter)
+        }
+    }
+
+    override fun onDestroy() {
+        try {
+            unregisterReceiver(stateReceiver)
+        } catch (e: Exception) {
+            // Receiver might not be registered
+        }
+        super.onDestroy()
     }
 
     override fun onStartListening() {
@@ -36,11 +65,11 @@ class DimmerTileService : TileService() {
         if (isCurrentlyEnabled) {
             // Turn OFF the dimmer
             DimmerService.stop(this)
-            updateTileToState(false)
+            // State will be updated via broadcast
         } else {
             // Turn ON the dimmer
             DimmerService.start(this)
-            updateTileToState(true)
+            // State will be updated via broadcast
         }
     }
 
