@@ -18,6 +18,15 @@
     <string name="start_on_boot">Bei Neustart starten</string>
     <string name="start_on_boot_description">Dimmer automatisch nach dem Hochfahren aktivieren</string>
 
+    <!-- Schedule -->
+    <string name="schedule_title">Zeitplan</string>
+    <string name="auto_off_title">Automatisch ausschalten</string>
+    <string name="auto_off_description">Dimmer zu einer bestimmten Uhrzeit ausschalten</string>
+    <string name="auto_off_time">Ausschaltzeit</string>
+    <string name="auto_on_title">Automatisch einschalten</string>
+    <string name="auto_on_description">Dimmer zu einer bestimmten Uhrzeit einschalten</string>
+    <string name="auto_on_time">Einschaltzeit</string>
+
     <!-- Quick Settings -->
     <string name="tile_label">Dimmer</string>
     <string name="tile_on">An (%d%%)</string>
