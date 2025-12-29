@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
@@ -32,17 +34,17 @@ jobs:
     - name: Build Debug APK
       run: gradle assembleDebug
 
-    - name: Build Release APK
-      run: gradle assembleRelease
+    - name: Rename APK
+      run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/ScreenDimmer.apk
 
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: screen-dimmer-debug
-        path: app/build/outputs/apk/debug/*.apk
-
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: screen-dimmer-release
-        path: app/build/outputs/apk/release/*.apk
+        tag_name: build-${{ github.run_number }}
+        name: Screen Dimmer Build ${{ github.run_number }}
+        body: |
+          Download die APK direkt auf dein Handy!
+          Tippe auf ScreenDimmer.apk zum Herunterladen.
+        files: app/build/outputs/apk/debug/ScreenDimmer.apk
+        draft: false
+        prerelease: false
