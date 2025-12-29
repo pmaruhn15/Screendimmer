@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Screen Dimmer</string>
+    <string name="app_description">Verdunkle deinen Bildschirm unter die minimale Helligkeit des Systems</string>
+
+    <!-- Permissions -->
+    <string name="permission_required">Berechtigung erforderlich</string>
+    <string name="permission_description">Screen Dimmer benötigt die Berechtigung \"Über anderen Apps anzeigen\", um den Bildschirm zu verdunkeln.</string>
+    <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="permission_granted">Berechtigung erteilt!</string>
+    <string name="permission_denied">Berechtigung verweigert</string>
+
+    <!-- Settings -->
+    <string name="enable_dimmer">Dimmer aktivieren</string>
+    <string name="enable_dimmer_description">Verdunkelungs-Overlay ein-/ausschalten</string>
+    <string name="dim_level">Verdunkelungsstufe</string>
+    <string name="dim_level_value">%d%%</string>
+    <string name="start_on_boot">Bei Neustart starten</string>
+    <string name="start_on_boot_description">Dimmer automatisch nach dem Hochfahren aktivieren</string>
+
+    <!-- Quick Settings -->
+    <string name="tile_label">Dimmer</string>
+    <string name="tile_on">An (%d%%)</string>
+    <string name="tile_off">Aus</string>
+    <string name="tile_no_permission">Berechtigung fehlt</string>
+    <string name="quick_settings_title">Schnelleinstellungen</string>
+    <string name="quick_settings_instructions">Wische vom oberen Bildschirmrand nach unten und tippe auf das Stift-Symbol, um die Schnelleinstellungen zu bearbeiten. Ziehe die \"Dimmer\"-Kachel in deine Schnelleinstellungen.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Dimmer Service</string>
+    <string name="notification_channel_description">Zeigt an, wenn der Bildschirm-Dimmer aktiv ist</string>
+    <string name="notification_title">Screen Dimmer aktiv</string>
+    <string name="notification_text">Verdunkelung: %d%%</string>
+    <string name="notification_action_stop">Ausschalten</string>
+</resources>
