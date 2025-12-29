@@ -10,6 +10,13 @@
     <string name="permission_granted">Berechtigung erteilt!</string>
     <string name="permission_denied">Berechtigung verweigert</string>
 
+    <!-- Battery Optimization -->
+    <string name="battery_optimization_title">Akku-Optimierung aktiv</string>
+    <string name="battery_optimization_description">Die Akku-Optimierung kann den Dimmer im Hintergrund beenden und Zeitpläne verhindern. Deaktiviere sie für zuverlässigen Betrieb.</string>
+    <string name="disable_battery_optimization">Deaktivieren</string>
+    <string name="battery_optimization_disabled">Akku-Optimierung deaktiviert</string>
+    <string name="battery_settings_not_found">Akku-Einstellungen nicht gefunden</string>
+
     <!-- Settings -->
     <string name="enable_dimmer">Dimmer aktivieren</string>
     <string name="enable_dimmer_description">Verdunkelungs-Overlay ein-/ausschalten</string>

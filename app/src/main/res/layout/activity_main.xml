@@ -73,6 +73,51 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Battery Optimization Warning Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBatteryOptimization"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="#FFF3E0"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/battery_optimization_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#E65100"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/battery_optimization_description"
+                    android:textSize="14sp"
+                    android:textColor="#BF360C"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonDisableBatteryOptimization"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/disable_battery_optimization"
+                    app:backgroundTint="#E65100" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Settings Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardSettings"

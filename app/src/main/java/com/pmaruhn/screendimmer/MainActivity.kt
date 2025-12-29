@@ -1,9 +1,12 @@
 package com.pmaruhn.screendimmer
 
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.SeekBar
 import android.widget.Toast
@@ -19,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 1001
+        private const val BATTERY_OPTIMIZATION_REQUEST_CODE = 1002
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +83,11 @@ class MainActivity : AppCompatActivity() {
             requestOverlayPermission()
         }
 
+        // Battery Optimization Button
+        binding.buttonDisableBatteryOptimization.setOnClickListener {
+            requestDisableBatteryOptimization()
+        }
+
         // Auto-Off Einstellungen
         binding.switchAutoOff.setOnCheckedChangeListener { _, isChecked ->
             prefsManager.isAutoOffEnabled = isChecked
@@ -119,14 +128,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        val hasPermission = Settings.canDrawOverlays(this)
+        val hasOverlayPermission = Settings.canDrawOverlays(this)
         val isEnabled = prefsManager.isDimmerEnabled
+        val isBatteryOptimized = isBatteryOptimizationEnabled()
 
-        binding.switchDimmer.isChecked = isEnabled && hasPermission
+        binding.switchDimmer.isChecked = isEnabled && hasOverlayPermission
         binding.switchStartOnBoot.isChecked = prefsManager.startOnBoot
         binding.textDimLevel.text = getString(R.string.dim_level_value, prefsManager.dimmerLevel)
 
-        if (hasPermission) {
+        // Overlay Permission Card
+        if (hasOverlayPermission) {
             binding.cardPermission.visibility = android.view.View.GONE
             binding.cardSettings.alpha = 1f
             binding.cardSchedule.alpha = 1f
@@ -148,6 +159,13 @@ class MainActivity : AppCompatActivity() {
             binding.switchAutoOn.isEnabled = false
             binding.layoutAutoOffTime.isEnabled = false
             binding.layoutAutoOnTime.isEnabled = false
+        }
+
+        // Battery Optimization Card
+        if (isBatteryOptimized && hasOverlayPermission) {
+            binding.cardBatteryOptimization.visibility = android.view.View.VISIBLE
+        } else {
+            binding.cardBatteryOptimization.visibility = android.view.View.GONE
         }
 
         updateScheduleUI()
@@ -196,16 +214,45 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
     }
 
+    private fun isBatteryOptimizationEnabled(): Boolean {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        return !powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun requestDisableBatteryOptimization() {
+        try {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivityForResult(intent, BATTERY_OPTIMIZATION_REQUEST_CODE)
+        } catch (e: Exception) {
+            // Fallback: Öffne allgemeine Akku-Einstellungen
+            try {
+                val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                startActivity(intent)
+            } catch (e2: Exception) {
+                Toast.makeText(this, R.string.battery_settings_not_found, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == OVERLAY_PERMISSION_REQUEST_CODE) {
-            if (Settings.canDrawOverlays(this)) {
-                Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+        when (requestCode) {
+            OVERLAY_PERMISSION_REQUEST_CODE -> {
+                if (Settings.canDrawOverlays(this)) {
+                    Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                }
             }
-            updateUI()
+            BATTERY_OPTIMIZATION_REQUEST_CODE -> {
+                if (!isBatteryOptimizationEnabled()) {
+                    Toast.makeText(this, R.string.battery_optimization_disabled, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+        updateUI()
     }
 }
