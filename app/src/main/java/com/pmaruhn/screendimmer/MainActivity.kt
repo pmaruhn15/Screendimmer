@@ -1,6 +1,9 @@
 package com.pmaruhn.screendimmer
 
+import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.TimePickerDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.service.quicksettings.TileService
 import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
@@ -25,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "ScreenDimmer"
         private const val OVERLAY_PERMISSION_REQUEST_CODE = 1001
         private const val BATTERY_OPTIMIZATION_REQUEST_CODE = 1002
+        private const val EXACT_ALARM_REQUEST_CODE = 1003
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         binding.switchDimmer.setOnCheckedChangeListener { _, isChecked ->
             if (!Settings.canDrawOverlays(this)) {
                 binding.switchDimmer.isChecked = false
-                requestOverlayPermission()
+                showOverlayPermissionDialog()
                 return@setOnCheckedChangeListener
             }
 
@@ -89,6 +94,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 DimmerService.stop(this)
             }
+            // Update the Quick Settings tile
+            requestTileUpdate()
         }
 
         binding.switchStartOnBoot.setOnCheckedChangeListener { _, isChecked ->
@@ -96,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.buttonGrantPermission.setOnClickListener {
-            requestOverlayPermission()
+            showOverlayPermissionDialog()
         }
 
         // Battery Optimization Button
@@ -106,12 +113,18 @@ class MainActivity : AppCompatActivity() {
 
         // Auto-Off Einstellungen
         binding.switchAutoOff.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !canScheduleExactAlarms()) {
+                binding.switchAutoOff.isChecked = false
+                showExactAlarmPermissionDialog()
+                return@setOnCheckedChangeListener
+            }
             prefsManager.isAutoOffEnabled = isChecked
             scheduleManager.scheduleAutoOff()
             updateScheduleUI()
         }
 
         binding.layoutAutoOffTime.setOnClickListener {
+            if (!prefsManager.isAutoOffEnabled) return@setOnClickListener
             showTimePickerDialog(
                 prefsManager.autoOffHour,
                 prefsManager.autoOffMinute
@@ -125,12 +138,18 @@ class MainActivity : AppCompatActivity() {
 
         // Auto-On Einstellungen
         binding.switchAutoOn.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !canScheduleExactAlarms()) {
+                binding.switchAutoOn.isChecked = false
+                showExactAlarmPermissionDialog()
+                return@setOnCheckedChangeListener
+            }
             prefsManager.isAutoOnEnabled = isChecked
             scheduleManager.scheduleAutoOn()
             updateScheduleUI()
         }
 
         binding.layoutAutoOnTime.setOnClickListener {
+            if (!prefsManager.isAutoOnEnabled) return@setOnClickListener
             showTimePickerDialog(
                 prefsManager.autoOnHour,
                 prefsManager.autoOnMinute
@@ -185,6 +204,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateScheduleUI()
+
+        // Sync tile state
+        requestTileUpdate()
     }
 
     private fun updateScheduleUI() {
@@ -222,12 +244,68 @@ class MainActivity : AppCompatActivity() {
         return Settings.canDrawOverlays(this)
     }
 
+    private fun showOverlayPermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.permission_dialog_title)
+            .setMessage(R.string.permission_dialog_message)
+            .setPositiveButton(R.string.permission_dialog_button) { _, _ ->
+                requestOverlayPermission()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun requestOverlayPermission() {
         val intent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
             Uri.parse("package:$packageName")
         )
         startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
+    }
+
+    private fun canScheduleExactAlarms(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
+    private fun showExactAlarmPermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.alarm_permission_title)
+            .setMessage(R.string.alarm_permission_message)
+            .setPositiveButton(R.string.permission_dialog_button) { _, _ ->
+                requestExactAlarmPermission()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun requestExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivityForResult(intent, EXACT_ALARM_REQUEST_CODE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Could not open alarm settings", e)
+                Toast.makeText(this, R.string.alarm_settings_not_found, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun requestTileUpdate() {
+        try {
+            TileService.requestListeningState(
+                this,
+                ComponentName(this, DimmerTileService::class.java)
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not request tile update", e)
+        }
     }
 
     private fun isBatteryOptimizationEnabled(): Boolean {
@@ -238,7 +316,7 @@ class MainActivity : AppCompatActivity() {
             } ?: false
         } catch (e: Exception) {
             Log.e(TAG, "Error checking battery optimization", e)
-            false // Assume not optimized if we can't check
+            false
         }
     }
 
@@ -249,7 +327,6 @@ class MainActivity : AppCompatActivity() {
             }
             startActivityForResult(intent, BATTERY_OPTIMIZATION_REQUEST_CODE)
         } catch (e: Exception) {
-            // Fallback: Öffne allgemeine Akku-Einstellungen
             try {
                 val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                 startActivity(intent)
@@ -273,6 +350,11 @@ class MainActivity : AppCompatActivity() {
             BATTERY_OPTIMIZATION_REQUEST_CODE -> {
                 if (!isBatteryOptimizationEnabled()) {
                     Toast.makeText(this, R.string.battery_optimization_disabled, Toast.LENGTH_SHORT).show()
+                }
+            }
+            EXACT_ALARM_REQUEST_CODE -> {
+                if (canScheduleExactAlarms()) {
+                    Toast.makeText(this, R.string.alarm_permission_granted, Toast.LENGTH_SHORT).show()
                 }
             }
         }

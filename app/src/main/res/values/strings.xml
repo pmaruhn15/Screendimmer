@@ -10,12 +10,23 @@
     <string name="permission_granted">Berechtigung erteilt!</string>
     <string name="permission_denied">Berechtigung verweigert</string>
 
+    <!-- Permission Dialog -->
+    <string name="permission_dialog_title">Overlay-Berechtigung</string>
+    <string name="permission_dialog_message">Um den Bildschirm zu verdunkeln, muss \"Screen Dimmer\" über anderen Apps angezeigt werden dürfen.\n\nAuf der nächsten Seite:\n1. Finde \"Screen Dimmer\" in der Liste\n2. Aktiviere den Schalter</string>
+    <string name="permission_dialog_button">Zu Einstellungen</string>
+
     <!-- Battery Optimization -->
     <string name="battery_optimization_title">Akku-Optimierung aktiv</string>
     <string name="battery_optimization_description">Die Akku-Optimierung kann den Dimmer im Hintergrund beenden und Zeitpläne verhindern. Deaktiviere sie für zuverlässigen Betrieb.</string>
     <string name="disable_battery_optimization">Deaktivieren</string>
     <string name="battery_optimization_disabled">Akku-Optimierung deaktiviert</string>
     <string name="battery_settings_not_found">Akku-Einstellungen nicht gefunden</string>
+
+    <!-- Alarm Permission -->
+    <string name="alarm_permission_title">Alarm-Berechtigung</string>
+    <string name="alarm_permission_message">Um Zeitpläne zu verwenden, benötigt Screen Dimmer die Berechtigung für exakte Alarme.\n\nAuf der nächsten Seite:\n1. Finde \"Screen Dimmer\"\n2. Erlaube exakte Alarme</string>
+    <string name="alarm_permission_granted">Alarm-Berechtigung erteilt!</string>
+    <string name="alarm_settings_not_found">Alarm-Einstellungen nicht gefunden</string>
 
     <!-- Settings -->
     <string name="enable_dimmer">Dimmer aktivieren</string>
