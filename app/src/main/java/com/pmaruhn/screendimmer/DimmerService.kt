@@ -5,9 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Point
@@ -23,6 +26,15 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
     private var overlayView: View? = null
     private var windowManager: WindowManager? = null
     private lateinit var prefsManager: PreferencesManager
+
+    private val configurationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_CONFIGURATION_CHANGED) {
+                // Screen rotation detected - update overlay size
+                updateOverlayLayout()
+            }
+        }
+    }
 
     companion object {
         private const val NOTIFICATION_ID = 1
@@ -67,6 +79,10 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
         prefsManager = PreferencesManager(this)
         prefsManager.registerOnChangeListener(this)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+        // Register for configuration changes (screen rotation)
+        val filter = IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
+        registerReceiver(configurationReceiver, filter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -95,12 +111,23 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        try {
+            unregisterReceiver(configurationReceiver)
+        } catch (e: Exception) {
+            // Receiver might not be registered
+        }
         prefsManager.unregisterOnChangeListener(this)
         hideOverlay()
         // Ensure state is synced on destroy
         prefsManager.isDimmerEnabled = false
         broadcastStateChange(false)
         super.onDestroy()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Also handle configuration changes here
+        updateOverlayLayout()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -158,6 +185,17 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
         overlayView?.setBackgroundColor(calculateOverlayColor())
     }
 
+    private fun updateOverlayLayout() {
+        overlayView?.let { view ->
+            try {
+                val params = createLayoutParams()
+                windowManager?.updateViewLayout(view, params)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     private fun calculateOverlayColor(): Int {
         val level = prefsManager.dimmerLevel
         val alpha = (level * 255 / 100).coerceIn(0, 230)
@@ -183,7 +221,7 @@ class DimmerService : Service(), SharedPreferences.OnSharedPreferenceChangeListe
             windowManager?.defaultDisplay?.getRealSize(screenSize)
         }
 
-        // Add extra padding to ensure full coverage
+        // Add extra padding to ensure full coverage on all edges
         val extraPadding = 200
 
         return WindowManager.LayoutParams(
